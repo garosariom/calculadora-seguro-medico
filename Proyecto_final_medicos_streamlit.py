@@ -1,7 +1,3 @@
-# .\myenv\Scripts\Activate
-# streamlit run Proyecto_final_medicos_streamlit.py para correr entorno virtual, no olvidar colocarlo 
-# deactivate
-
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -144,3 +140,42 @@ if st.sidebar.button("🔍 Calcular Costo"):
     ax_bmi.set_ylabel("Costo del Seguro (USD)")
     ax_bmi.legend()
     st.pyplot(fig_bmi)
+
+# 📌 Chatbot de preguntas frecuentes sobre el seguro
+faq = {
+    "¿Por qué es tan caro mi seguro?": "El precio depende de tu edad, hábitos como fumar y región donde vives.",
+    "¿Qué variables afectan el costo?": "Las variables principales son edad, IMC, número de hijos, si fumas y región.",
+    "¿Puedo reducir el precio?": "Sí, por ejemplo si dejas de fumar o cambias a un plan con deducible más alto.",
+    "¿Qué significa IMC?": "IMC es el Índice de Masa Corporal y afecta el riesgo para las aseguradoras.",
+    "Gracias": "¡Con gusto! Si tienes más dudas, aquí estaré 😊",
+    "Adiós": "¡Hasta luego! Cuídate mucho.",
+}
+
+if "activar_chatbot" not in st.session_state:
+    st.session_state.activar_chatbot = False
+
+if st.sidebar.button("¿Tienes dudas sobre tu seguro? 🤔"):
+    st.session_state.activar_chatbot = True
+
+if st.session_state.activar_chatbot:
+    st.markdown("---")
+    st.markdown("### 🤖 Preguntas frecuentes sobre tu seguro médico")
+    st.markdown("Haz clic en una pregunta para ver la respuesta:")
+
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    for mensaje in st.session_state.messages:
+        with st.chat_message(mensaje["role"]):
+            st.markdown(mensaje["content"])
+
+    for pregunta, respuesta in faq.items():
+        if st.button(pregunta):
+            st.session_state.messages.append({"role": "user", "content": pregunta})
+            with st.chat_message("user"):
+                st.markdown(pregunta)
+
+            st.session_state.messages.append({"role": "assistant", "content": respuesta})
+            with st.chat_message("assistant"):
+                st.markdown(respuesta)
+
