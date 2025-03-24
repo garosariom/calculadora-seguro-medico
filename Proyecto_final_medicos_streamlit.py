@@ -141,7 +141,7 @@ if st.sidebar.button("🔍 Calcular Costo"):
     ax_bmi.legend()
     st.pyplot(fig_bmi)
 
-# 📌 Chatbot de preguntas frecuentes sobre el seguro
+# 📌 Preguntas frecuentes del chatbot
 faq = {
     "¿Por qué es tan caro mi seguro?": "El precio depende de tu edad, hábitos como fumar y región donde vives.",
     "¿Qué variables afectan el costo?": "Las variables principales son edad, IMC, número de hijos, si fumas y región.",
@@ -151,6 +151,7 @@ faq = {
     "Adiós": "¡Hasta luego! Cuídate mucho.",
 }
 
+# Activador del chatbot
 if "activar_chatbot" not in st.session_state:
     st.session_state.activar_chatbot = False
 
@@ -162,20 +163,27 @@ if st.session_state.activar_chatbot:
     st.markdown("### 🤖 Preguntas frecuentes sobre tu seguro médico")
     st.markdown("Haz clic en una pregunta para ver la respuesta:")
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+    # Inicializa conversación activa si no existe
+    if "pregunta_activa" not in st.session_state:
+        st.session_state.pregunta_activa = None
+        st.session_state.respuesta_activa = None
 
-    for mensaje in st.session_state.messages:
-        with st.chat_message(mensaje["role"]):
-            st.markdown(mensaje["content"])
-
+    # Mostrar botones de preguntas
     for pregunta, respuesta in faq.items():
         if st.button(pregunta):
-            st.session_state.messages.append({"role": "user", "content": pregunta})
-            with st.chat_message("user"):
-                st.markdown(pregunta)
+            st.session_state.pregunta_activa = pregunta
+            st.session_state.respuesta_activa = respuesta
+            st.experimental_rerun()
 
-            st.session_state.messages.append({"role": "assistant", "content": respuesta})
-            with st.chat_message("assistant"):
-                st.markdown(respuesta)
+    # Mostrar conversación activa (una a la vez)
+    if st.session_state.pregunta_activa and st.session_state.respuesta_activa:
+        with st.chat_message("user"):
+            st.markdown(st.session_state.pregunta_activa)
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.respuesta_activa)
 
+        # Botón para cerrar conversación
+        if st.button("❌ Cerrar conversación"):
+            st.session_state.pregunta_activa = None
+            st.session_state.respuesta_activa = None
+            st.experimental_rerun()
