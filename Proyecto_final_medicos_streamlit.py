@@ -14,14 +14,15 @@ from sklearn.linear_model import Ridge, RidgeCV
 from sklearn.model_selection import train_test_split
 from google.oauth2.service_account import Credentials
 
-# 📌 Función para guardar en Google Sheets
 def guardar_en_google_sheets(datos_usuario):
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds = Credentials.from_service_account_info(
-            st.secrets["gcp_service_account"],
-            scopes=scope
-        )
+
+        # 🔥 Transformar correctamente la clave dentro del diccionario
+        service_account_info = dict(st.secrets["gcp_service_account"])
+        service_account_info["private_key"] = service_account_info["private_key"].replace("\\n", "\n")
+
+        creds = Credentials.from_service_account_info(service_account_info, scopes=scope)
         client = gspread.authorize(creds)
         sheet = client.open("datos_seguro").sheet1
         sheet.append_row(datos_usuario)
