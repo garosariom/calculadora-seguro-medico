@@ -139,3 +139,4 @@ if st.sidebar.button("🔍 Calcular Costo"):
     ax_bmi.legend()
     st.pyplot(fig_bmi)
 st.write("🔐 Keys disponibles en secrets:", list(st.secrets.keys()))
+st.write("🔍 Primeros caracteres de la clave:", st.secrets["gcp_service_account"]["private_key"][:20])
