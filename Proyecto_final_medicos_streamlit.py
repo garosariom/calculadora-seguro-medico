@@ -121,12 +121,17 @@ if st.sidebar.button("🔍 Calcular Costo"):
     st.subheader("📊 Comparación de Género")
     st.markdown(f"{color_genero} Si fueras del otro género, el costo de tu seguro sería **${costo_genero:,.2f}** ({'menos' if dif_genero < 0 else 'más'} que ahora)")
 
+    # Crear gráfico de línea en vez de barras
     fig_genero, ax_genero = plt.subplots(figsize=(8, 4))
-    labels = ["Femenino" if gender == 1 else "Masculino", "Masculino" if gender == 1 else "Femenino"]
-    ax_genero.bar(labels, [prediccion_costo[0], costo_genero], color=["blue", "green" if dif_genero < 0 else "red"])
+    labels = ["Actual", "Otro género"]
+    valores = [prediccion_costo[0], costo_genero]
+
+    ax_genero.plot(labels, valores, marker="o", linestyle="-", color="red" if dif_genero > 0 else "green", linewidth=2)
     ax_genero.set_ylabel("Costo del Seguro (USD)")
     ax_genero.set_title("Impacto del Género en el Costo del Seguro")
+    ax_genero.grid(True)
     st.pyplot(fig_genero)
+
 
     # Comparación visual del BMI
     st.subheader("📊 Impacto de tu indice de tu indice de masa corporal (IMC) en el Costo")
@@ -139,5 +144,3 @@ if st.sidebar.button("🔍 Calcular Costo"):
     ax_bmi.set_ylabel("Costo del Seguro (USD)")
     ax_bmi.legend()
     st.pyplot(fig_bmi)
-st.write("🔐 Keys disponibles en secrets:", list(st.secrets.keys()))
-st.write("🔍 Primeros caracteres de la clave:", st.secrets["gcp_service_account"]["private_key"][:20])
