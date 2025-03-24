@@ -163,27 +163,25 @@ if st.session_state.activar_chatbot:
     st.markdown("### 🤖 Preguntas frecuentes sobre tu seguro médico")
     st.markdown("Haz clic en una pregunta para ver la respuesta:")
 
-    # Inicializa conversación activa si no existe
+    # Inicializar variables si no existen
     if "pregunta_activa" not in st.session_state:
-        st.session_state.pregunta_activa = None
-        st.session_state.respuesta_activa = None
+        st.session_state.pregunta_activa = ""
+        st.session_state.respuesta_activa = ""
 
-    # Mostrar botones de preguntas
-    for pregunta, respuesta in faq.items():
-        if st.button(pregunta):
-            st.session_state.pregunta_activa = pregunta
-            st.session_state.respuesta_activa = respuesta
-            st.experimental_rerun()
+    # Mostrar botones y capturar clic
+    pregunta_seleccionada = st.radio("Selecciona una pregunta:", list(faq.keys()))
 
-    # Mostrar conversación activa (una a la vez)
-    if st.session_state.pregunta_activa and st.session_state.respuesta_activa:
+    if st.button("Mostrar respuesta"):
+        st.session_state.pregunta_activa = pregunta_seleccionada
+        st.session_state.respuesta_activa = faq[pregunta_seleccionada]
+
+    # Mostrar respuesta si ya fue seleccionada
+    if st.session_state.pregunta_activa:
         with st.chat_message("user"):
             st.markdown(st.session_state.pregunta_activa)
         with st.chat_message("assistant"):
             st.markdown(st.session_state.respuesta_activa)
 
-        # Botón para cerrar conversación
         if st.button("❌ Cerrar conversación"):
-            st.session_state.pregunta_activa = None
-            st.session_state.respuesta_activa = None
-            st.experimental_rerun()
+            st.session_state.pregunta_activa = ""
+            st.session_state.respuesta_activa = ""
