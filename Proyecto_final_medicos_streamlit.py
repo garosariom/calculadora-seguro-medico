@@ -12,13 +12,16 @@ import os
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import Ridge, RidgeCV
 from sklearn.model_selection import train_test_split
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
 # 📌 Función para guardar en Google Sheets
 def guardar_en_google_sheets(datos_usuario):
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds = ServiceAccountCredentials.from_json_keyfile_name("credenciales_google.json", scope)
+        creds = Credentials.from_service_account_info(
+            st.secrets["gcp_service_account"],
+            scopes=scope
+        )
         client = gspread.authorize(creds)
         sheet = client.open("datos_seguro").sheet1
         sheet.append_row(datos_usuario)
@@ -54,11 +57,11 @@ X_test_poly = poly.transform(X_test)
 ridge_best = Ridge(alpha=best_alpha)
 ridge_best.fit(X_train_poly, Y_train)
 
-# 📌 Crear la interfaz en Streamlit
+# 📈 Crear la interfaz en Streamlit
 st.title("📊 Calculadora de Seguro Médico")
 st.markdown("Ingrese los datos en el panel lateral para calcular el costo estimado del seguro médico.")
 
-# 📌 Barra lateral para ingresar datos
+# 📈 Barra lateral para ingresar datos
 st.sidebar.header("📋 Ingrese sus datos")
 
 age = st.sidebar.number_input("Edad", min_value=18, max_value=100, step=1)
@@ -69,7 +72,7 @@ children = st.sidebar.number_input("Número de Hijos", min_value=0, max_value=10
 smoker = st.sidebar.radio("Fumador", [1, 0], format_func=lambda x: "Sí" if x == 1 else "No")
 region = st.sidebar.selectbox("Región", [1, 2, 3, 4], format_func=lambda x: ["Noroeste", "Noreste", "Suroeste", "Sureste"][x-1])
 
-# 📌 Botón de predicción
+# 📈 Botón de predicción
 if st.sidebar.button("🔍 Calcular Costo"):
     bmi = round((weight / 2.205) / (height ** 2), 2)
     st.markdown(f"🔍 **Tu indice de masa corporal es: {bmi}**")
@@ -135,3 +138,4 @@ if st.sidebar.button("🔍 Calcular Costo"):
     ax_bmi.set_ylabel("Costo del Seguro (USD)")
     ax_bmi.legend()
     st.pyplot(fig_bmi)
+st.write("🔐 Keys disponibles en secrets:", list(st.secrets.keys()))
